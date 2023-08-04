@@ -17,6 +17,7 @@ class GildedRose {
     }
 
     public void updateQuality() {
+        // 测试方法见 com.gildedrose.GildedRoseTest.approvalTest；本地执行应该一切 ok
         TagIdentifier tagIdentifier = new TagIdentifier();
         for (Item curItem : items) {
             // 解耦 name 和 processor 的关系，通过 tag 来提高可扩展性
