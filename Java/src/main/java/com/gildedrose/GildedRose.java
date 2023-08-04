@@ -1,60 +1,30 @@
 package com.gildedrose;
 
+import com.gildedrose.core.Processor;
+import com.gildedrose.core.ProcessorDelegate;
+import com.gildedrose.core.Tag;
+import com.gildedrose.core.TagIdentifier;
+
+import java.util.List;
+
 class GildedRose {
     Item[] items;
+
+    private ProcessorDelegate processorDelegate = new ProcessorDelegate();
 
     public GildedRose(Item[] items) {
         this.items = items;
     }
 
     public void updateQuality() {
-        for (int i = 0; i < items.length; i++) {
-            Item curItem = items[i];
-            if (curItem.name.equals("Backstage passes to a TAFKAL80ETC concert")) {
-                if (curItem.quality < 50) {
-                    curItem.quality = curItem.quality + 1;
-
-                    if (curItem.sellIn < 11) {
-                        if (curItem.quality < 50) {
-                            curItem.quality = curItem.quality + 1;
-                        }
-                    }
-
-                    if (curItem.sellIn < 6) {
-                        if (curItem.quality < 50) {
-                            curItem.quality = curItem.quality + 1;
-                        }
-                    }
-                }
-
-                curItem.sellIn = curItem.sellIn - 1;
-
-                if (curItem.sellIn < 0) {
-                    curItem.quality = curItem.quality - curItem.quality;
-                }
-            } else if (curItem.name.equals("Aged Brie")) {
-                if (curItem.quality < 50) {
-                    curItem.quality = curItem.quality + 1;
-                }
-
-                curItem.sellIn = curItem.sellIn - 1;
-
-                if (curItem.sellIn < 0) {
-                    if (curItem.quality < 50) {
-                        curItem.quality = curItem.quality + 1;
-                    }
-                }
-            } else if (curItem.name.equals("Sulfuras, Hand of Ragnaros")) {
-                // do nothing
-            } else {
-                if (curItem.quality > 0) {
-                    curItem.quality = curItem.quality - 1;
-                }
-                curItem.sellIn = curItem.sellIn - 1;
-                if (curItem.sellIn < 0 && curItem.quality > 0) {
-                    curItem.quality = curItem.quality - 1;
-                }
-            }
+        TagIdentifier tagIdentifier = new TagIdentifier();
+        for (Item curItem : items) {
+            // 解耦 name 和 processor 的关系，通过 tag 来提高可扩展性
+            List<Tag> tags = tagIdentifier.identify(curItem);
+            // 确定当前 item 的 processor
+            List<Processor> processors = processorDelegate.determineProcessor(tags);
+            // 执行 processor
+            processorDelegate.doProcess(processors, curItem);
         }
     }
 }
